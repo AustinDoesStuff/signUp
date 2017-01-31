@@ -18,7 +18,7 @@ import webapp2
 import re
 import cgi
 
-def BuildPage(userError, passError, emailError):
+def BuildPage(username, password, email, userError, passError,conPassError, emailError):
     header = """
     <html>
         <head>
@@ -30,13 +30,14 @@ def BuildPage(userError, passError, emailError):
 
     mainBody = """
         <form action = '/' method='post'>
-            <label>Username:<input type='text' name='user'></input></label><p>{user}</p>
-            <label>Password:<input type='password' name='pass'></input></label><p>{password}</p>
-            <label>Email:<input type='text' name='email'></input></label><p>{email}</p>
+            <label>Username:<input type='text' name='user' required>{username}</input></label><span> {user}</span><br><br>
+            <label>Password:<input type='password' name='pass' required>{displayPassword}</input></label><span> {password}</span><br><br>
+            <label>Confirm Password:<input type='password' name='confirmPass' required></input></label><span> {confirmPassword}</span><br><br>
+            <label>Email:<input type='text' name='email'>{displayEmail}</input></label><span> {email}</span><br><br>
             <br>
             <input type='submit'>
         </form>
-    """.format(user = userError, password = passError, email = emailError)
+    """.format(username = username, displayPassword = password, displayEmail = email, user = userError, password = passError,confirmPassword = conPassError, email = emailError)
     footer = """
         </body>
     </html>
@@ -47,7 +48,7 @@ def BuildPage(userError, passError, emailError):
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        content = BuildPage("","","")
+        content = BuildPage("","","","","","","")
         self.response.write(content)
 
     def post(self):
@@ -57,6 +58,7 @@ class MainHandler(webapp2.RequestHandler):
 
         username = cgi.escape(self.request.get('user'))
         password = cgi.escape(self.request.get('pass'))
+        confirmPassword = cgi.escape(self.request.get('confirmPass'))
         email = cgi.escape(self.request.get('email'))
 
         userRE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
@@ -66,6 +68,7 @@ class MainHandler(webapp2.RequestHandler):
         userMessage = ""
         passMessage = ""
         emailMessage = ""
+        confirmPassMessage = ""
 
         if valid(userRE, username) == None:
             userMessage = "Hey, that's not a valid username, idiot"
@@ -73,16 +76,21 @@ class MainHandler(webapp2.RequestHandler):
             passMessage = "Your password sucks, try again"
         if valid(emailRE, email) == None:
             emailMessage = "You broke the email, dummy"
+        if len(email) < 1:
+            emailMessage = ""
+        if password != confirmPassword:
+            confirmPassMessage = "They didn't match. Learn to type."
 
-        if len(userMessage) > 1 or len(passMessage) > 1 or len(emailMessage) > 1:
-            self.response.write(BuildPage(userMessage,passMessage,emailMessage))
+        if len(userMessage) > 1 or len(passMessage) > 1 or len(emailMessage) > 1 or password != confirmPassword:
+            self.response.write(BuildPage(username, password, email, userMessage,passMessage, confirmPassMessage, emailMessage))
         else:
-            self.redirect('/welcome')
+            self.redirect('/welcome?username=' + username)
 
 
 class WelcomeHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write("Thanks for logging in, {username}!").format(MainHandler.post("username"))
+        user = self.request.get("username")
+        self.response.write("Thanks for logging in, " + user + "!")
 
 
 app = webapp2.WSGIApplication([
