@@ -30,10 +30,10 @@ def BuildPage(username, email, userError, passError,conPassError, emailError):
 
     mainBody = """
         <form action = '/' method='post'>
-            <label>Username:<input type='text' name='user' value = {username} required></input></label><span> {user}</span><br><br>
+            <label>Username:<input type='text' name='user' value = '{username}' required></input></label><span> {user}</span><br><br>
             <label>Password:<input type='password' name='pass' required></input></label><span> {password}</span><br><br>
             <label>Confirm Password:<input type='password' name='confirmPass' required></input></label><span> {confirmPassword}</span><br><br>
-            <label>Email:<input type='text' name='email' value = {displayEmail}></input></label><span> {email}</span><br><br>
+            <label>Email:<input type='text' name='email' value = '{displayEmail}'></input></label><span> {email}</span><br><br>
             <br>
             <input type='submit'>
         </form>
