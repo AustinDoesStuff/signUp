@@ -18,7 +18,7 @@ import webapp2
 import re
 import cgi
 
-def BuildPage(username, password, email, userError, passError,conPassError, emailError):
+def BuildPage(username, email, userError, passError,conPassError, emailError):
     header = """
     <html>
         <head>
@@ -30,14 +30,14 @@ def BuildPage(username, password, email, userError, passError,conPassError, emai
 
     mainBody = """
         <form action = '/' method='post'>
-            <label>Username:<input type='text' name='user' required>{username}</input></label><span> {user}</span><br><br>
-            <label>Password:<input type='password' name='pass' required>{displayPassword}</input></label><span> {password}</span><br><br>
+            <label>Username:<input type='text' name='user' value = {username} required></input></label><span> {user}</span><br><br>
+            <label>Password:<input type='password' name='pass' required></input></label><span> {password}</span><br><br>
             <label>Confirm Password:<input type='password' name='confirmPass' required></input></label><span> {confirmPassword}</span><br><br>
-            <label>Email:<input type='text' name='email'>{displayEmail}</input></label><span> {email}</span><br><br>
+            <label>Email:<input type='text' name='email' value = {displayEmail}></input></label><span> {email}</span><br><br>
             <br>
             <input type='submit'>
         </form>
-    """.format(username = username, displayPassword = password, displayEmail = email, user = userError, password = passError,confirmPassword = conPassError, email = emailError)
+    """.format(username = username, displayEmail = email, user = userError, password = passError,confirmPassword = conPassError, email = emailError)
     footer = """
         </body>
     </html>
@@ -48,7 +48,7 @@ def BuildPage(username, password, email, userError, passError,conPassError, emai
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        content = BuildPage("","","","","","","")
+        content = BuildPage("","","","","","")
         self.response.write(content)
 
     def post(self):
@@ -82,7 +82,7 @@ class MainHandler(webapp2.RequestHandler):
             confirmPassMessage = "They didn't match. Learn to type."
 
         if len(userMessage) > 1 or len(passMessage) > 1 or len(emailMessage) > 1 or password != confirmPassword:
-            self.response.write(BuildPage(username, password, email, userMessage,passMessage, confirmPassMessage, emailMessage))
+            self.response.write(BuildPage(username, email, userMessage,passMessage, confirmPassMessage, emailMessage))
         else:
             self.redirect('/welcome?username=' + username)
 
